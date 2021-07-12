@@ -13,7 +13,6 @@ from modules.model import DevignModel, GGNNSum
 from trainer import train
 from utils import tally_param, debug
 
-
 if __name__ == '__main__':
     torch.manual_seed(1000)
     np.random.seed(1000)
@@ -69,7 +68,7 @@ if __name__ == '__main__':
     debug('#' * 100)
     model.cuda()
     loss_function = BCELoss(reduction='sum')
-    optim = Adam(model.parameters(), lr=0.0001, weight_decay=0.001)
+    optim = Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
     train(model=model, dataset=dataset, max_steps=1000000, dev_every=128,
           loss_function=loss_function, optimizer=optim,
           save_path=model_dir + '/GGNNSumModel', max_patience=100, log_every=None)
