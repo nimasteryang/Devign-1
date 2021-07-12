@@ -35,6 +35,7 @@ class BatchGraph:
         lengths = [f.size(0) for f in vectors]
         max_len = max(lengths)
         for i, v in enumerate(vectors):
+            print("device",v.device)
             vectors[i] = torch.cat(
                 (v, torch.zeros(size=(max_len - v.size(0), *(v.shape[1:])), requires_grad=v.requires_grad,
                                 device=v.device)), dim=0)

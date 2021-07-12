@@ -49,8 +49,13 @@ class DataSet:
         with open(train_src) as fp:
             train_data = json.load(fp)
             for entry in tqdm(train_data):
+                # print(entry)
+                # print(len(entry[self.n_ident]))
+                # print(entry[self.n_ident])
+                # print(entry[self.g_ident])
+                # print("target",entry[self.l_ident])
                 example = DataEntry(datset=self, num_nodes=len(entry[self.n_ident]), features=entry[self.n_ident],
-                                    edges=entry[self.g_ident], target=entry[self.l_ident][0][0])
+                                    edges=entry[self.g_ident], target=entry[self.l_ident])
                 if self.feature_size == 0:
                     self.feature_size = example.features.size(1)
                     debug('Feature Size %d' % self.feature_size)
@@ -62,7 +67,7 @@ class DataSet:
                 for entry in tqdm(valid_data):
                     example = DataEntry(datset=self, num_nodes=len(entry[self.n_ident]),
                                         features=entry[self.n_ident],
-                                        edges=entry[self.g_ident], target=entry[self.l_ident][0][0])
+                                        edges=entry[self.g_ident], target=entry[self.l_ident])
                     self.valid_examples.append(example)
         if test_src is not None:
             debug('Reading Test File!')
@@ -71,7 +76,7 @@ class DataSet:
                 for entry in tqdm(test_data):
                     example = DataEntry(datset=self, num_nodes=len(entry[self.n_ident]),
                                         features=entry[self.n_ident],
-                                        edges=entry[self.g_ident], target=entry[self.l_ident][0][0])
+                                        edges=entry[self.g_ident], target=entry[self.l_ident])
                     self.test_examples.append(example)
 
     def get_edge_type_number(self, _type):
@@ -101,7 +106,7 @@ class DataSet:
     def initialize_test_batch(self, batch_size=-1):
         if batch_size == -1:
             batch_size = self.batch_size
-        self.test_batches = initialize_batch(self.test_examples, batch_size)
+        self.test_batches = initialize_batch(self.test_examples, batch_size,shuffle=True)
         return len(self.test_batches)
         pass
 

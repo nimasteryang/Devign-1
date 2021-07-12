@@ -62,7 +62,7 @@ def evaluate_metrics(model, loss_function, num_batches, data_iter):
     pass
 
 
-def train(model, dataset, max_steps, dev_every, loss_function, optimizer, save_path, log_every=50, max_patience=5):
+def train(model, dataset, max_steps, dev_every, loss_function, optimizer, save_path, log_every=50, max_patience=100):
     debug('Start Training')
     train_losses = []
     best_model = None
@@ -82,8 +82,8 @@ def train(model, dataset, max_steps, dev_every, loss_function, optimizer, save_p
             batch_loss.backward()
             optimizer.step()
             if step_count % dev_every == (dev_every - 1):
-                valid_loss, valid_f1 = evaluate_loss(model, loss_function, dataset.initialize_train_batch(),
-                                                     dataset.get_next_train_batch)
+                valid_loss, valid_f1 = evaluate_loss(model, loss_function, dataset.batch_size,
+                                                     dataset.get_next_valid_batch)
                 if valid_f1 > best_f1:
                     patience_counter = 0
                     best_f1 = valid_f1
@@ -107,7 +107,21 @@ def train(model, dataset, max_steps, dev_every, loss_function, optimizer, save_p
     _save_file = open(save_path + '-model.bin', 'wb')
     torch.save(model.state_dict(), _save_file)
     _save_file.close()
-    acc, pr, rc, f1 = evaluate_metrics(model, loss_function, dataset.initialize_train_batch(),
-                                       dataset.get_next_train_batch)
-    debug('%s\tTest Accuracy: %0.2f\tPrecision: %0.2f\tRecall: %0.2f\tF1: %0.2f' % (save_path, acc, pr, rc, f1))
-    debug('=' * 100)
+    debug("test 10 batchs")
+    acc_total = 0
+    pr_total = 0
+    rc_total = 0
+    f1_total = 0
+    for i in range(10):
+        acc, pr, rc, f1 = evaluate_metrics(model, loss_function, dataset.initialize_test_batch(),
+                                           dataset.get_next_test_batch)
+        debug('%s\tNo.%d\tTest Accuracy: %0.2f\tPrecision: %0.2f\tRecall: %0.2f\tF1: %0.2f' % (
+        save_path, i, acc, pr, rc, f1))
+        debug('=' * 100)
+        acc_total += acc
+        pr_total += pr
+        rc_total += rc
+        f1_total += f1
+    debug('%s\tAvg\tTest Accuracy: %0.2f\tPrecision: %0.2f\tRecall: %0.2f\tF1: %0.2f' % (
+    save_path, acc_total / 10, pr_total / 10, rc_total / 10, f1_total / 10))
+
