@@ -41,7 +41,7 @@ if __name__ == '__main__':
         os.makedirs(model_dir)
     input_dir = args.input_dir
     processed_data_path = os.path.join(input_dir, 'processed.bin')
-    if False and os.path.exists(processed_data_path):
+    if os.path.exists(processed_data_path):
         debug('Reading already processed data from %s!' % processed_data_path)
         dataset = pickle.load(open(processed_data_path, 'rb'))
         debug(len(dataset.train_examples), len(dataset.valid_examples), len(dataset.test_examples))
